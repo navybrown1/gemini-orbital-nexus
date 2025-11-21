@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Orbital Nexus",
+  "description": "An interactive, voice-driven solar system explorer powered by Gemini Live API and Image Generation.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
