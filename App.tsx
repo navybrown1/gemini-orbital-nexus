@@ -12,7 +12,10 @@ const CAMERA_ZOOM_START=1.45,CAMERA_ZOOM_ALT_RANGE=140000,CAMERA_ZOOM_REDUCTION=
 // Space-transition tuning: Earth disc shrinks and sinks as altitude rises for a continuous "leaving Earth" visual.
 const EARTH_RECEDE_START_ALT=22000,EARTH_RECEDE_ALT_RANGE=220000,EARTH_RADIUS_BASE=1.02,EARTH_RADIUS_SHRINK=.62,EARTH_GRAD_X=.32,EARTH_GRAD_Y=.46,EARTH_GRAD_INNER=.15,EARTH_Y_BASE=1.14,EARTH_Y_SHIFT=.34;
 // Chase-camera tuning: velocity-based lead + adaptive follow + hard frame guard to keep the rocket on-screen.
-const CAM_LEAD_FACTOR=.22,CAM_LEAD_MIN=-260,CAM_LEAD_MAX=260,CAM_FOLLOW_MIN=.08,CAM_FOLLOW_MAX=.14,CAM_FOLLOW_VEL_SCALE=12000,CAM_ROCKET_Y_BASE=.62,CAM_ROCKET_Y_SHIFT=.2,CAM_ROCKET_Y_ALT_RANGE=150000,CAM_ROCKET_Y_MIN=.36,CAM_ROCKET_Y_MAX=.64,CAM_SCREEN_BASE=.68,CAM_FRAME_MIN=.2,CAM_FRAME_MAX=.82;
+const CAM_LEAD_FACTOR=.22,CAM_LEAD_MIN=-260,CAM_LEAD_MAX=260;
+const CAM_FOLLOW_MIN=.08,CAM_FOLLOW_MAX=.14,CAM_FOLLOW_VEL_SCALE=12000;
+const CAM_ROCKET_Y_BASE=.62,CAM_ROCKET_Y_SHIFT=.2,CAM_ROCKET_Y_ALT_RANGE=150000,CAM_ROCKET_Y_MIN=.36,CAM_ROCKET_Y_MAX=.64;
+const CAM_SCREEN_BASE=.68,CAM_FRAME_MIN=.2,CAM_FRAME_MAX=.82;
 const starsSeed=()=>Array.from({length:STAR_COUNT},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.7+.2,a:Math.random()*.75+.25,t:Math.random()*6.28}));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rho=a=>a>100000?0:RHO0*Math.exp(-Math.max(0,a)/H);
@@ -53,7 +56,7 @@ export default function App(){
     if(ground.y<H+300){drawOceanPad(ctx,W,H,ground.y,s.t)}else drawEarthFromSpace(ctx,W,H,s);
     drawClouds(ctx,W,H,s,project);s.flash*=.9;if(s.flash>.04){const p=project(s.down,s.alt,W,H,zoomFor(s),s),g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,260);g.addColorStop(0,`rgba(255,245,210,${s.flash})`);g.addColorStop(1,'rgba(255,245,210,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}drawParticles(ctx,W,H,s,project);if(s.booster)drawBooster(ctx,W,H,s,project);const zoom=zoomFor(s),p=project(s.down,s.alt,W,H,zoom,s),shakeX=(Math.random()-.5)*s.shake,shakeY=(Math.random()-.5)*s.shake;drawRocket(ctx,p.x+shakeX,p.y+shakeY,zoom,thrusting(s),s);drawBloom(ctx,p.x,p.y,zoom,s);drawVignette(ctx,W,H);}
   // Dynamic pullback keeps the full ascent readable while preserving cinematic scale.
-  function zoomFor(s){return clamp(CAMERA_ZOOM_START-clamp(s.alt/CAMERA_ZOOM_ALT_RANGE,0,1)*CAMERA_ZOOM_REDUCTION,CAMERA_ZOOM_MIN,CAMERA_ZOOM_START)}
+  function zoomFor(s){return clamp(CAMERA_ZOOM_START-clamp(s.alt/CAMERA_ZOOM_ALT_RANGE,0,1)*CAMERA_ZOOM_REDUCTION,CAMERA_ZOOM_MIN,CAMERA_ZOOM_START)} // 1.45 -> 0.5 over ~140 km
   function thrusting(s){return s.mode==='flight'||s.mode==='ignition'}
   // Earth recedes with altitude so the vehicle clearly transitions from atmosphere into space.
   function drawEarthFromSpace(ctx,W,H,s){const t=clamp((s.alt-EARTH_RECEDE_START_ALT)/EARTH_RECEDE_ALT_RANGE,0,1),r=Math.max(W,H)*(EARTH_RADIUS_BASE-t*EARTH_RADIUS_SHRINK),x=W/2,y=H*EARTH_Y_BASE+t*H*EARTH_Y_SHIFT,g=ctx.createRadialGradient(x-r*EARTH_GRAD_X,y-r*EARTH_GRAD_Y,r*EARTH_GRAD_INNER,x,y,r);g.addColorStop(0,'rgba(95,170,255,.78)');g.addColorStop(.4,'rgba(37,99,156,.58)');g.addColorStop(.75,'rgba(14,67,110,.34)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle=`rgba(147,197,253,${clamp(.45-t*.24,.15,.45)})`;ctx.lineWidth=2+t*2;ctx.beginPath();ctx.arc(x,y,r*.995,Math.PI*1.03,Math.PI*1.97);ctx.stroke()}
