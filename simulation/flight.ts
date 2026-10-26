@@ -406,6 +406,14 @@ export function advanceMission(m: Mission, elapsed: number) {
   }
 }
 
+export function advanceFrame(m: Mission, realSeconds: number, speed: number) {
+  if (!Number.isFinite(realSeconds) || realSeconds <= 0) return;
+  // Occluded but visible browser windows may render only a few times a second.
+  // Account for those frames without allowing long stalls to skip minutes.
+  const scale = m.mode === "countdown" ? 1 : clamp(speed, 1, 20);
+  advanceMission(m, Math.min(realSeconds, 1) * scale);
+}
+
 export function formatTime(time: number) {
   const seconds =
     time < -0.001

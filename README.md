@@ -39,7 +39,7 @@ The deterministic engine uses a fixed **20 ms** integration step, polar two-dime
 
 This is a fictional educational simulation, not validated engineering software. It omits Earth rotation, 3D geometry, detailed atmosphere, lift, hardware failures, and perturbations. It uses a first-order numerical integrator. Runtime assets are self-contained; audio is optional. Reduced-motion preferences suppress plume flicker and exhaust particles.
 
-Simulation time stops when the browser tab is hidden. A stalled rendering frame advances at most 100 ms of real time before applying time warp, avoiding surprise jumps. Flights remain in memory only and are cleared by reload. Export before resetting or closing the page.
+Simulation time stops when the browser tab is hidden. Slow frames account for up to one second of real time before applying time warp; longer stalls are capped to avoid skipping minutes. Flights remain in memory only and are cleared by reload. Export before resetting or closing the page.
 
 Read more: [NASA — Flight to Orbit](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/flight-to-orbit/), [NASA — Ideal Rocket Equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ideal-rocket-equation/).
 

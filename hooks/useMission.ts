@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { advanceMission, command, createMission } from "../simulation/flight";
+import { advanceFrame, command, createMission } from "../simulation/flight";
 import type { FlightCommand, Preset } from "../simulation/flight";
 import { FlightAudio } from "../services/audio";
 
@@ -19,13 +19,10 @@ export function useMission() {
       previous = performance.now(),
       lastPublish = 0;
     const loop = (now: number) => {
-      const dt = Math.min((now - previous) / 1000, 0.1);
+      const dt = (now - previous) / 1000;
       previous = now;
       if (!document.hidden) {
-        advanceMission(
-          mission.current,
-          dt * (mission.current.mode === "countdown" ? 1 : speedRef.current),
-        );
+        advanceFrame(mission.current, dt, speedRef.current);
         engineAudio.update(
           soundRef.current && !mission.current.paused
             ? mission.current.throttle
